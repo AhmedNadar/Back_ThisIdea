@@ -30,6 +30,9 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       if @project.save
+        # dealy job
+        ExpireProjectJob.set(wait_until: @project.expires_at).perform_later(@project)
+
         format.html { redirect_to @project, notice: 'Project was successfully created.' }
         format.json { render :show, status: :created, location: @project }
       else
